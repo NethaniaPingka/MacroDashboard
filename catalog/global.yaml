@@ -1,0 +1,489 @@
+# Global macro series, all from FRED.
+#
+# Every id here was audited against the live API on 2026-08-18. Re-run
+# `python scripts/audit_catalog.py` after editing, and periodically — FRED
+# retires and renames international series, and the euro-area ids embed the
+# membership count (EZ19 -> EZ20), which will change as the bloc grows.
+
+# ---------------------------------------------------------------- United States
+- series_id: US.CPI.HEADLINE.IDX
+  name: US CPI, all items
+  country: US
+  category: inflation
+  subcategory: headline
+  source: fred
+  source_id: CPIAUCSL
+  frequency: M
+  unit: Index 1982-84=100
+  seasonal_adj: true
+  default_transform: yoy
+
+- series_id: US.CPI.CORE.IDX
+  name: US core CPI, ex food & energy
+  country: US
+  category: inflation
+  subcategory: core
+  source: fred
+  source_id: CPILFESL
+  frequency: M
+  unit: Index 1982-84=100
+  seasonal_adj: true
+  default_transform: yoy
+
+- series_id: US.PCE.HEADLINE.IDX
+  name: US PCE price index
+  country: US
+  category: inflation
+  subcategory: headline
+  source: fred
+  source_id: PCEPI
+  frequency: M
+  unit: Index 2017=100
+  seasonal_adj: true
+  default_transform: yoy
+
+- series_id: US.PCE.CORE.IDX
+  name: US core PCE price index
+  country: US
+  category: inflation
+  subcategory: core
+  source: fred
+  source_id: PCEPILFE
+  frequency: M
+  unit: Index 2017=100
+  seasonal_adj: true
+  default_transform: yoy
+  notes: The Fed's target measure.
+
+- series_id: US.GDP.REAL
+  name: US real GDP
+  country: US
+  category: growth
+  subcategory: gdp
+  source: fred
+  source_id: GDPC1
+  frequency: Q
+  unit: Bn chained 2017 USD, SAAR
+  seasonal_adj: true
+  default_transform: qoq_saar
+
+- series_id: US.PAYROLLS
+  name: US nonfarm payrolls
+  country: US
+  category: growth
+  subcategory: labour
+  source: fred
+  source_id: PAYEMS
+  frequency: M
+  unit: Thousands of persons
+  seasonal_adj: true
+  default_transform: mom
+
+- series_id: US.UNEMPLOYMENT
+  name: US unemployment rate
+  country: US
+  category: growth
+  subcategory: labour
+  source: fred
+  source_id: UNRATE
+  frequency: M
+  unit: Percent
+  seasonal_adj: true
+  default_transform: level
+
+- series_id: US.INDPRO
+  name: US industrial production
+  country: US
+  category: growth
+  subcategory: activity
+  source: fred
+  source_id: INDPRO
+  frequency: M
+  unit: Index 2017=100
+  seasonal_adj: true
+  default_transform: yoy
+
+- series_id: US.RETAIL.SALES
+  name: US retail sales
+  country: US
+  category: growth
+  subcategory: activity
+  source: fred
+  source_id: RSAFS
+  frequency: M
+  unit: Mn USD
+  seasonal_adj: true
+  default_transform: yoy
+
+- series_id: US.CONSUMER.SENTIMENT
+  name: US consumer sentiment (UMich)
+  country: US
+  category: growth
+  subcategory: survey
+  source: fred
+  source_id: UMCSENT
+  frequency: M
+  unit: Index 1966Q1=100
+  default_transform: level
+
+- series_id: US.POLICY.RATE
+  name: US federal funds rate
+  country: US
+  category: rates
+  subcategory: policy
+  source: fred
+  source_id: FEDFUNDS
+  frequency: M
+  unit: Percent
+  default_transform: level
+
+- series_id: US.UST.2Y
+  name: US 2-year Treasury yield
+  country: US
+  category: rates
+  subcategory: curve
+  source: fred
+  source_id: DGS2
+  frequency: D
+  unit: Percent
+  default_transform: level
+
+- series_id: US.UST.10Y
+  name: US 10-year Treasury yield
+  country: US
+  category: rates
+  subcategory: curve
+  source: fred
+  source_id: DGS10
+  frequency: D
+  unit: Percent
+  default_transform: level
+
+- series_id: US.CURVE.2S10S
+  name: US 10y-2y spread
+  country: US
+  category: rates
+  subcategory: curve
+  source: fred
+  source_id: T10Y2Y
+  frequency: D
+  unit: Percentage points
+  default_transform: level
+  notes: Stored directly rather than derived, so it survives a gap in either leg.
+
+- series_id: US.M2
+  name: US M2 money stock
+  country: US
+  category: rates
+  subcategory: money
+  source: fred
+  source_id: M2SL
+  frequency: M
+  unit: Bn USD
+  seasonal_adj: true
+  default_transform: yoy
+
+# ----------------------------------------------------------------- Euro area
+- series_id: EA.POLICY.RATE
+  name: ECB deposit facility rate
+  country: EA
+  category: rates
+  subcategory: policy
+  source: fred
+  source_id: ECBDFR
+  frequency: D
+  unit: Percent
+  default_transform: level
+
+- series_id: EA.HICP.IDX
+  name: Euro area HICP, all items
+  country: EA
+  category: inflation
+  subcategory: headline
+  source: fred
+  source_id: CP0000EZ19M086NEST
+  frequency: M
+  unit: Index 2015=100
+  default_transform: yoy
+  notes: The EZ19 suffix tracks euro-area membership and will need updating if it grows.
+
+- series_id: EA.GDP.REAL
+  name: Euro area real GDP
+  country: EA
+  category: growth
+  subcategory: gdp
+  source: fred
+  source_id: CLVMNACSCAB1GQEA19
+  frequency: Q
+  unit: Mn chained 2010 EUR
+  seasonal_adj: true
+  default_transform: qoq_saar
+
+- series_id: EA.UNEMPLOYMENT
+  name: Euro area unemployment rate
+  country: EA
+  category: growth
+  subcategory: labour
+  source: fred
+  source_id: LRHUTTTTEZM156S
+  frequency: M
+  unit: Percent
+  seasonal_adj: true
+  default_transform: level
+  active: false
+  notes: >
+    Audit 2026-08-18 — abandoned upstream, last observation 2023-01. FRED has no
+    live euro-area unemployment series; Eurostat direct would be the way back.
+
+- series_id: EA.BUND.10Y
+  name: Germany 10-year Bund yield
+  country: EA
+  category: rates
+  subcategory: curve
+  source: fred
+  source_id: IRLTLT01DEM156N
+  frequency: M
+  unit: Percent
+  default_transform: level
+  notes: >
+    The euro-area aggregate (IRLTLT01EZM156N) was abandoned upstream at 2026-01.
+    The Bund is the bloc's benchmark long rate anyway, so this is the better
+    series rather than merely the available one.
+
+# ------------------------------------------- US GDP growth contributions (BEA)
+# Percentage points of the quarter's annualised real GDP growth, published by
+# BEA rather than derived here. Deliberately not computed from the real level
+# series (PCEC96, GPDIC1, ...): those are chain-weighted, so their changes do
+# not add up to the headline. PCE + investment + government + net exports sums
+# to US.GDP.REAL's qoq_saar to within a rounding tenth; a hand-rolled version
+# from chained dollars does not.
+#
+# Exports and imports are the split of net exports and must not be added
+# alongside it — charting all six would double-count trade.
+- series_id: US.GDP.CONTRIB.PCE
+  name: Consumption contribution to GDP growth
+  country: US
+  category: growth
+  subcategory: gdp_contribution
+  source: fred
+  source_id: DPCERY2Q224SBEA
+  frequency: Q
+  unit: Percentage points, SAAR
+  seasonal_adj: true
+  default_transform: level
+
+- series_id: US.GDP.CONTRIB.INVESTMENT
+  name: Investment contribution to GDP growth
+  country: US
+  category: growth
+  subcategory: gdp_contribution
+  source: fred
+  source_id: A006RY2Q224SBEA
+  frequency: Q
+  unit: Percentage points, SAAR
+  seasonal_adj: true
+  default_transform: level
+  notes: Gross private domestic investment, so it carries the inventory swing.
+
+- series_id: US.GDP.CONTRIB.GOVERNMENT
+  name: Government contribution to GDP growth
+  country: US
+  category: growth
+  subcategory: gdp_contribution
+  source: fred
+  source_id: A822RY2Q224SBEA
+  frequency: Q
+  unit: Percentage points, SAAR
+  seasonal_adj: true
+  default_transform: level
+
+- series_id: US.GDP.CONTRIB.NETEXPORTS
+  name: Net exports contribution to GDP growth
+  country: US
+  category: growth
+  subcategory: gdp_contribution
+  source: fred
+  source_id: A019RY2Q224SBEA
+  frequency: Q
+  unit: Percentage points, SAAR
+  seasonal_adj: true
+  default_transform: level
+
+- series_id: US.GDP.CONTRIB.EXPORTS
+  name: Exports contribution to GDP growth
+  country: US
+  category: growth
+  subcategory: gdp_contribution
+  source: fred
+  source_id: A020RY2Q224SBEA
+  frequency: Q
+  unit: Percentage points, SAAR
+  seasonal_adj: true
+  default_transform: level
+  notes: Half of US.GDP.CONTRIB.NETEXPORTS. Never chart both.
+
+- series_id: US.GDP.CONTRIB.IMPORTS
+  name: Imports contribution to GDP growth
+  country: US
+  category: growth
+  subcategory: gdp_contribution
+  source: fred
+  source_id: A021RY2Q224SBEA
+  frequency: Q
+  unit: Percentage points, SAAR
+  seasonal_adj: true
+  default_transform: level
+  notes: >
+    Already signed as a contribution, so it is negative when imports rise.
+    Do not flip the sign again.
+
+# ============================== Asia ex-Indonesia — OUT OF SCOPE FOR v1 =======
+#
+# Decision, 2026-08-18: the global view is US + euro area only. Everything in
+# this section is inactive and none of it reaches the app.
+#
+# The reason is sourcing, not interest. FRED cannot support a regional Asian
+# view at monthly frequency:
+#
+#   * Singapore, Malaysia, Thailand, Philippines — no monthly CPI and no policy
+#     rate exist on FRED at all. Only annual World Bank inflation
+#     (FPCPITOTLZG{ISO3}, verified working) and BIS effective exchange rates.
+#     Annual inflation is too coarse to be worth a tab.
+#   * China, Japan, India — monthly CPI mirrors exist but are abandoned
+#     upstream, last observations 2025-04, 2021-06, and 2025-03 respectively.
+#
+# Reviving this section means adding a second data spine, most plausibly IMF
+# IFS (monthly CPI and policy rates for nearly every country, free, no key).
+# The entries below are kept rather than deleted so that work starts from a
+# record of what was already tried, instead of rediscovering these dead ends.
+#
+# --- abandoned upstream: id resolves, data stopped ---
+- series_id: CN.CPI.IDX
+  name: China CPI, all items
+  country: CN
+  category: inflation
+  source: fred
+  source_id: CHNCPIALLMINMEI
+  frequency: M
+  unit: Index 2015=100
+  default_transform: yoy
+  active: false
+  notes: Abandoned upstream, last observation 2025-04. Needs IMF IFS.
+
+- series_id: JP.CPI.IDX
+  name: Japan CPI, all items
+  country: JP
+  category: inflation
+  source: fred
+  source_id: JPNCPIALLMINMEI
+  frequency: M
+  unit: Index 2015=100
+  default_transform: yoy
+  active: false
+  notes: Abandoned upstream, last observation 2021-06. Needs IMF IFS.
+
+- series_id: IN.CPI.IDX
+  name: India CPI, all items
+  country: IN
+  category: inflation
+  source: fred
+  source_id: INDCPIALLMINMEI
+  frequency: M
+  unit: Index 2015=100
+  default_transform: yoy
+  active: false
+  notes: Abandoned upstream, last observation 2025-03. Needs IMF IFS.
+
+# --- ASEAN annual inflation: live, but too coarse for v1 ---
+- series_id: SG.CPI.INFLATION.ANNUAL
+  name: Singapore inflation rate, annual
+  country: SG
+  category: inflation
+  source: fred
+  source_id: FPCPITOTLZGSGP
+  frequency: A
+  unit: Percent
+  default_transform: level
+  active: false
+
+- series_id: MY.CPI.INFLATION.ANNUAL
+  name: Malaysia inflation rate, annual
+  country: MY
+  category: inflation
+  source: fred
+  source_id: FPCPITOTLZGMYS
+  frequency: A
+  unit: Percent
+  default_transform: level
+  active: false
+
+- series_id: TH.CPI.INFLATION.ANNUAL
+  name: Thailand inflation rate, annual
+  country: TH
+  category: inflation
+  source: fred
+  source_id: FPCPITOTLZGTHA
+  frequency: A
+  unit: Percent
+  default_transform: level
+  active: false
+
+- series_id: PH.CPI.INFLATION.ANNUAL
+  name: Philippines inflation rate, annual
+  country: PH
+  category: inflation
+  source: fred
+  source_id: FPCPITOTLZGPHL
+  frequency: A
+  unit: Percent
+  default_transform: level
+  active: false
+
+# --- ASEAN monthly CPI: no source exists ---
+- series_id: SG.CPI.IDX
+  name: Singapore CPI, all items
+  country: SG
+  category: inflation
+  source: fred
+  source_id: SGPCPIALLMINMEI
+  frequency: M
+  unit: Index 2015=100
+  default_transform: yoy
+  active: false
+  notes: Audit 2026-08-18 — series does not exist on FRED. Needs IMF IFS or SingStat.
+
+- series_id: MY.CPI.IDX
+  name: Malaysia CPI, all items
+  country: MY
+  category: inflation
+  source: fred
+  source_id: MYSCPIALLMINMEI
+  frequency: M
+  unit: Index 2015=100
+  default_transform: yoy
+  active: false
+  notes: Audit 2026-08-18 — series does not exist on FRED. Needs IMF IFS or DOSM.
+
+- series_id: TH.CPI.IDX
+  name: Thailand CPI, all items
+  country: TH
+  category: inflation
+  source: fred
+  source_id: THACPIALLMINMEI
+  frequency: M
+  unit: Index 2015=100
+  default_transform: yoy
+  active: false
+  notes: Audit 2026-08-18 — series does not exist on FRED. Needs IMF IFS.
+
+- series_id: PH.CPI.IDX
+  name: Philippines CPI, all items
+  country: PH
+  category: inflation
+  source: fred
+  source_id: PHLCPIALLMINMEI
+  frequency: M
+  unit: Index 2015=100
+  default_transform: yoy
+  active: false
+  notes: Audit 2026-08-18 — series does not exist on FRED. Needs IMF IFS or PSA.

@@ -1,0 +1,118 @@
+# Market data via yfinance. No API key needed, so these are the series that can
+# be tested first and the ones most likely to break later — yfinance scrapes an
+# undocumented endpoint. Every ticker here is verified working; re-run
+# `python scripts/audit_catalog.py --source yahoo` if charts go flat.
+
+- series_id: MKT.USDIDR
+  name: USD/IDR
+  country: ID
+  category: markets
+  subcategory: fx
+  source: yahoo
+  source_id: IDR=X
+  frequency: D
+  unit: IDR per USD
+  default_transform: level
+
+- series_id: MKT.JKSE
+  name: Jakarta Composite Index
+  country: ID
+  category: markets
+  subcategory: equity
+  source: yahoo
+  source_id: ^JKSE
+  frequency: D
+  unit: Index
+  default_transform: level
+
+- series_id: MKT.DXY
+  name: US dollar index (DXY)
+  country: US
+  category: markets
+  subcategory: fx
+  source: yahoo
+  source_id: DX-Y.NYB
+  frequency: D
+  unit: Index
+  default_transform: level
+
+- series_id: MKT.EURUSD
+  name: EUR/USD
+  country: EA
+  category: markets
+  subcategory: fx
+  source: yahoo
+  source_id: EURUSD=X
+  frequency: D
+  unit: USD per EUR
+  default_transform: level
+
+- series_id: MKT.SPX
+  name: S&P 500
+  country: US
+  category: markets
+  subcategory: equity
+  source: yahoo
+  source_id: ^GSPC
+  frequency: D
+  unit: Index
+  default_transform: level
+
+- series_id: MKT.STOXX50
+  name: Euro Stoxx 50
+  country: EA
+  category: markets
+  subcategory: equity
+  source: yahoo
+  source_id: ^STOXX50E
+  frequency: D
+  unit: Index
+  default_transform: level
+
+- series_id: MKT.BRENT
+  name: Brent crude
+  country: GLOBAL
+  category: markets
+  subcategory: commodity
+  source: yahoo
+  source_id: BZ=F
+  frequency: D
+  unit: USD per barrel
+  default_transform: level
+
+- series_id: MKT.WTI
+  name: WTI crude
+  country: GLOBAL
+  category: markets
+  subcategory: commodity
+  source: yahoo
+  source_id: CL=F
+  frequency: D
+  unit: USD per barrel
+  default_transform: level
+
+- series_id: MKT.GOLD
+  name: Gold
+  country: GLOBAL
+  category: markets
+  subcategory: commodity
+  source: yahoo
+  source_id: GC=F
+  frequency: D
+  unit: USD per troy ounce
+  default_transform: level
+
+- series_id: MKT.NIKKEI
+  name: Nikkei 225
+  country: JP
+  category: markets
+  subcategory: equity
+  source: yahoo
+  source_id: ^N225
+  frequency: D
+  unit: Index
+  default_transform: level
+
+# Not included, and why: Newcastle thermal coal and Malaysian crude palm oil
+# (FCPO) are both central to Indonesia's export story but neither has a
+# reliable Yahoo ticker. They are candidates for the seed/manual path instead.

@@ -1,0 +1,21 @@
+# Pinned to what was installed and verified on 2026-08-18.
+# Note the major versions: pandas 3.x and yfinance 1.x both changed APIs
+# from the 2.x / 0.2.x lines, so do not loosen these without testing.
+streamlit==1.61.1
+pandas==3.0.5
+numpy==2.5.2
+plotly==6.9.0
+duckdb==1.5.5
+pyyaml==6.0.3
+yfinance==1.6.0
+openpyxl==3.1.5
+pyarrow==24.0.0
+requests==2.34.2
+
+# Deliberately NOT used:
+#   fredapi  - the FRED JSON API is two lines of requests, and going direct
+#              gives clearer errors and no third-party pandas coupling.
+#   stadata  - the official BPS wrapper hard-caps pandas<3 and lxml<5 and
+#              declares pytest as a RUNTIME dependency. Installing it silently
+#              downgraded pandas 3.0.5 -> 2.3.3. sources/bps.py calls the same
+#              REST endpoints directly instead.

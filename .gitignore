@@ -1,0 +1,30 @@
+# Secrets — never commit API keys
+.streamlit/secrets.toml
+
+# The store is rebuildable from catalog + data/seed, so it is not tracked
+data/macro.duckdb
+data/macro.duckdb.wal
+data/exports/
+
+# Manual CSVs are TRACKED as of Phase 4, and the rest of the folder is not.
+# Until Phase 4 this was a drop zone for raw BPS/BI downloads, so all of it was
+# ignored. It is now where the Data Manager writes hand-typed observations —
+# the BI Rate exists nowhere else, and data/macro.duckdb is deliberately
+# disposable, so ignoring these would mean a fresh clone loses the only copy.
+# Spreadsheets and PDFs dropped here are still working files.
+data/manual/*
+!data/manual/.gitkeep
+!data/manual/*.csv
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

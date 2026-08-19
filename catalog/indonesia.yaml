@@ -1,0 +1,349 @@
+# Indonesian series.
+#
+# Sourcing reality, established by audit on 2026-08-18:
+#
+#   * FRED's Indonesia mirrors are BACKFILL ONLY. They carry long clean history
+#     but were abandoned upstream — the CPI index stops at 2025-04 and will
+#     never advance. Kept for depth, never relied on for a current print.
+#   * BPS WebAPI is the live source. It works well, but its headline CPI is
+#     rebased every few years under a NEW var_id, so the current 2022=100
+#     variables only start in 2024. Hence the split: FRED for history, BPS for
+#     everything recent.
+#   * Bank Indonesia data (BI Rate, FX reserves) is not on the BPS API at all
+#     and comes from committed seed CSVs.
+#
+# BPS source_id format is "var_id/vervar/turvar"; vervar defaults to 9999
+# (INDONESIA) and turvar to 0 (no breakdown). Note that vervar means REGION for
+# most variables but EXPENDITURE COMPONENT for the national accounts, which is
+# why GDP names it explicitly. Use `python scripts/bps_explore.py` to find ids.
+
+# =========================================================== inflation (live)
+- series_id: ID.CPI.INFLATION.YOY
+  name: Indonesia inflation, YoY
+  country: ID
+  category: inflation
+  subcategory: headline
+  source: bps_api
+  source_id: 2263/9999/0
+  frequency: M
+  unit: Percent
+  default_transform: level
+  notes: >
+    BPS "Inflasi Tahunan (Y-on-Y) 38 Provinsi (2022=100)". Published as a rate,
+    not an index, which sidesteps the rebasing problem entirely — inflation
+    rates chain across base changes where index levels do not.
+
+- series_id: ID.CPI.INFLATION.MOM
+  name: Indonesia inflation, MoM
+  country: ID
+  category: inflation
+  subcategory: headline
+  source: bps_api
+  source_id: 2262/9999/0
+  frequency: M
+  unit: Percent
+  default_transform: level
+  notes: BPS "Inflasi Bulanan (M-to-M) 38 Provinsi (2022=100)".
+
+# ====================================================== inflation (backfill)
+- series_id: ID.CPI.HEADLINE.IDX
+  name: Indonesia CPI index (historical)
+  country: ID
+  category: inflation
+  subcategory: headline
+  source: fred
+  source_id: IDNCPIALLMINMEI
+  frequency: M
+  unit: Index 2015=100
+  default_transform: yoy
+  notes: >
+    BACKFILL ONLY — abandoned upstream at 2025-04. Gives 1990-2025 depth that
+    BPS's current 2022=100 variables cannot. Its YoY overlaps ID.CPI.INFLATION.YOY
+    through 2025-04, which is a useful cross-check on both.
+
+- series_id: ID.CPI.INFLATION.ANNUAL
+  name: Indonesia inflation rate, annual
+  country: ID
+  category: inflation
+  subcategory: headline
+  source: fred
+  source_id: FPCPITOTLZGIDN
+  frequency: A
+  unit: Percent
+  default_transform: level
+  notes: World Bank annual series — long-run context.
+
+# =============================================================== growth (live)
+- series_id: ID.GDP.REAL
+  name: Indonesia real GDP
+  country: ID
+  category: growth
+  subcategory: gdp
+  source: bps_api
+  source_id: 1956/800/0
+  frequency: Q
+  unit: Bn IDR, constant 2010 prices
+  seasonal_adj: false
+  default_transform: yoy
+  notes: >
+    BPS "[Seri 2010] 2. PDB Triwulanan Atas Dasar Harga Konstan menurut
+    Pengeluaran", vervar 800 = PRODUK DOMESTIK BRUTO (the total, not a
+    component). Not seasonally adjusted, so YoY is the meaningful transform —
+    Indonesian GDP has a pronounced Ramadan and harvest pattern that would
+    swamp a quarterly rate.
+
+- series_id: ID.GDP.REAL.OECD
+  name: Indonesia real GDP (OECD mirror, historical)
+  country: ID
+  category: growth
+  subcategory: gdp
+  source: fred
+  source_id: IDNGDPRQPSMEI
+  frequency: Q
+  unit: Bn IDR, constant prices
+  seasonal_adj: false
+  default_transform: yoy
+  active: false
+  notes: >
+    Superseded by the BPS series above, which is current. Kept inactive because
+    it reaches back to 1990 where BPS's 2010 series does not — activate it if
+    pre-2010 history is ever wanted.
+
+# ============================================================= external (live)
+- series_id: ID.TRADE.BALANCE
+  name: Indonesia trade balance
+  country: ID
+  category: external
+  subcategory: trade
+  source: bps_api
+  source_id: 498/9999/0
+  frequency: M
+  unit: Mn USD
+  default_transform: level
+  start_date: "2021-01-01"
+  notes: >
+    Starts 2021 because BPS silently changed this variable's unit: values before
+    2021 are billions of USD rounded to 0.1 (October 2020 reads 3.6 against an
+    exports-minus-imports figure of 3577.4 Mn), and from 2021 they are millions.
+    Same var_id throughout, no flag in the metadata. From 2021 the identity
+    exports - imports - balance holds at exactly 0.0 across every month.
+
+- series_id: ID.EXPORTS
+  name: Indonesia exports
+  country: ID
+  category: external
+  subcategory: trade
+  source: bps_api
+  source_id: 196/9999/0
+  frequency: M
+  unit: Mn USD
+  default_transform: yoy
+
+- series_id: ID.IMPORTS
+  name: Indonesia imports
+  country: ID
+  category: external
+  subcategory: trade
+  source: bps_api
+  source_id: 497/9999/0
+  frequency: M
+  unit: Mn USD
+  default_transform: yoy
+
+# ============================================ monetary & reserves (IMF via FRED)
+# BPS publishes national statistics, not central bank data, so these come from
+# FRED's IMF-sourced series. Unlike the OECD CPI mirrors, both of these are
+# genuinely current (last updated 2026-08-10 and 2026-07-16), which is why they
+# are used instead of the hand-built seed CSVs originally planned.
+- series_id: ID.RATES.INTERBANK
+  name: Indonesia interbank call money rate
+  country: ID
+  category: rates
+  subcategory: policy
+  source: fred
+  source_id: IRSTCI01IDM156N
+  frequency: M
+  unit: Percent
+  default_transform: level
+  notes: >
+    This is the overnight interbank rate, NOT the BI Rate. It tracks the policy
+    rate closely and is the best automated proxy available, but do not label it
+    as the policy rate on a chart. For the actual BI Rate see ID.POLICY.RATE.
+
+- series_id: ID.FX.RESERVES
+  name: Indonesia reserves excluding gold
+  country: ID
+  category: external
+  subcategory: reserves
+  source: fred
+  source_id: TRESEGIDM052N
+  frequency: M
+  unit: Bn USD
+  scale: 0.001
+  default_transform: level
+  notes: >
+    IMF series, reported in millions of USD and scaled here to billions.
+    Excludes gold, so it runs slightly below Bank Indonesia's headline
+    "cadangan devisa" figure — close, but not the same number BI announces.
+
+# ====================================================== awaiting manual entry
+# No automated source exists for the actual BI Rate: Bank Indonesia has no open
+# API and FRED does not carry it. It stays inactive until entered through the
+# Data Manager page or a committed seed CSV.
+- series_id: ID.POLICY.RATE
+  name: BI Rate
+  country: ID
+  category: rates
+  subcategory: policy
+  source: manual
+  source_id: bi/bi-rate
+  frequency: D
+  unit: Percent
+  default_transform: level
+  active: true
+  staleness_days: 400
+  source_ref: https://www.bi.go.id/en/statistik/indikator/BI-Rate.aspx
+  notes: >
+    Bank Indonesia policy rate, renamed from the BI 7-Day Reverse Repo Rate in
+    2024. Entered by hand through the Data Manager and stored in
+    data/manual/ID.POLICY.RATE.csv.
+
+    Frequency is D because this is an EVENT series, not a monthly one: it is
+    dated to the Board of Governors decisions that moved it, and BI can move
+    twice inside one calendar month — which a monthly grid cannot represent,
+    since both dates would collapse onto the 1st and collide. D means each
+    announcement keeps its own date and nothing is snapped.
+
+    staleness_days overrides the 5-day daily default. A policy rate that has not
+    moved in months is Bank Indonesia holding, not a broken feed, so it must not
+    be judged by how recently it changed. 400 days is roughly "BI has skipped a
+    year of meetings", which really would be worth investigating.
+
+# ================================================ GDP expenditure breakdown
+# Same BPS variable as ID.GDP.REAL (1956), read at a different vervar. For the
+# national accounts vervar is the EXPENDITURE COMPONENT, not the region, so
+# these are siblings of the total rather than a regional split of it.
+#
+# Verified 2026-08-19 against the accounting identity: household + NPISH +
+# government + GFCF + inventories + exports + discrepancy - imports equals
+# ID.GDP.REAL to within 0.4 Bn IDR across all 66 quarters — rounding on a
+# 3.6m base. Re-run that check after touching sources/bps.py.
+#
+# Imports are stored POSITIVE, as BPS publishes them ("7. Dikurangi: Impor").
+# The minus sign belongs to the contribution calculation, not the stored value.
+- series_id: ID.GDP.CONSUMPTION
+  name: Household consumption
+  country: ID
+  category: growth
+  subcategory: gdp_component
+  source: bps_api
+  source_id: 1956/100/0
+  frequency: Q
+  unit: Bn IDR, constant 2010 prices
+  seasonal_adj: false
+  default_transform: yoy
+  notes: Pengeluaran Konsumsi Rumahtangga — a little over half of Indonesian GDP.
+
+- series_id: ID.GDP.NPISH
+  name: Non-profit institutions serving households
+  country: ID
+  category: growth
+  subcategory: gdp_component
+  source: bps_api
+  source_id: 1956/200/0
+  frequency: Q
+  unit: Bn IDR, constant 2010 prices
+  seasonal_adj: false
+  default_transform: yoy
+  notes: >
+    Pengeluaran Konsumsi LNPRT. Around 1% of GDP, but it swings hard in
+    election quarters and is worth keeping separate for that reason.
+
+- series_id: ID.GDP.GOVERNMENT
+  name: Government consumption
+  country: ID
+  category: growth
+  subcategory: gdp_component
+  source: bps_api
+  source_id: 1956/300/0
+  frequency: Q
+  unit: Bn IDR, constant 2010 prices
+  seasonal_adj: false
+  default_transform: yoy
+  notes: Pengeluaran Konsumsi Pemerintah. Heavily back-loaded into Q4 by the budget cycle.
+
+- series_id: ID.GDP.GFCF
+  name: Gross fixed capital formation
+  country: ID
+  category: growth
+  subcategory: gdp_component
+  source: bps_api
+  source_id: 1956/400/0
+  frequency: Q
+  unit: Bn IDR, constant 2010 prices
+  seasonal_adj: false
+  default_transform: yoy
+  notes: Pembentukan Modal Tetap Domestik Bruto — investment, roughly 30% of GDP.
+
+- series_id: ID.GDP.INVENTORY
+  name: Change in inventories
+  country: ID
+  category: growth
+  subcategory: gdp_component
+  source: bps_api
+  source_id: 1956/500/0
+  frequency: Q
+  unit: Bn IDR, constant 2010 prices
+  seasonal_adj: false
+  default_transform: level
+  notes: >
+    Perubahan Inventori. A flow that can go negative, so YoY percent change is
+    meaningless here — level is the honest default. It matters only through its
+    contribution to growth.
+
+- series_id: ID.GDP.EXPORTS
+  name: Exports of goods and services
+  country: ID
+  category: growth
+  subcategory: gdp_component
+  source: bps_api
+  source_id: 1956/600/0
+  frequency: Q
+  unit: Bn IDR, constant 2010 prices
+  seasonal_adj: false
+  default_transform: yoy
+  notes: >
+    National-accounts exports in constant rupiah — NOT ID.EXPORTS, which is the
+    monthly customs figure in current US dollars. The two answer different
+    questions and will not agree; do not chart them together.
+
+- series_id: ID.GDP.IMPORTS
+  name: Imports of goods and services
+  country: ID
+  category: growth
+  subcategory: gdp_component
+  source: bps_api
+  source_id: 1956/700/0
+  frequency: Q
+  unit: Bn IDR, constant 2010 prices
+  seasonal_adj: false
+  default_transform: yoy
+  notes: >
+    Stored positive, as published. Imports subtract from GDP, so the sign is
+    applied by the contribution calculation — see charts.py.
+
+- series_id: ID.GDP.DISCREPANCY
+  name: Statistical discrepancy
+  country: ID
+  category: growth
+  subcategory: gdp_component
+  source: bps_api
+  source_id: 1956/790/0
+  frequency: Q
+  unit: Bn IDR, constant 2010 prices
+  seasonal_adj: false
+  default_transform: level
+  notes: >
+    Diskrepansi Statistik. Not an economic quantity, but without it the
+    components do not sum to the total, and a contribution chart that silently
+    drops it misattributes the gap to whatever is charted last.
